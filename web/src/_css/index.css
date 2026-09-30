@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --custom-white: #f9f6f0;
+  --custom-black: #1c191f;
+  --color-cream: var(--custom-white);
+  --color-ink: var(--custom-black);
+}
+
+@layer base {
+  body {
+    background-color: #0d0d0d;
+    font-family: monospace;
+    color: var(--color-cream);
+  }
+
+  mark {
+    color: var(--color-indigo-600);
+    background-color: var(--color-cream);
+    border-radius: 0.25rem;
+    padding-inline: 0.25rem;
+  }
+}

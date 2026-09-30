@@ -1,13 +1,11 @@
-
-
-
+import { Outlet } from "react-router-dom";
 
 const App = () => {
   return (
     <section>
-      <h1>Newsletter Subscribe Dashboard</h1>
+      <Outlet />
     </section>
-  )
-}
+  );
+};
 
 export default App;
