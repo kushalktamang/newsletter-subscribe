@@ -1,0 +1,38 @@
+version: "3"
+
+tasks:
+  dev:
+    desc: start all apps in dev the mode
+    dev:
+    cmds:
+      - node --run dev
+
+  fmt:
+    desc: formating all packages
+    fmt:
+    cmds:
+      - node --run fmt
+
+  lint:
+    desc: linting packages
+    lint:
+    cmds:
+      - node --run lint
+
+  migrate:
+    desc: migrating
+    lint:
+    cmds:
+      - node --run migrate
+
+  generate:
+    desc: generate
+    lint:
+    cmds:
+      - node --run generate
+
+  studio:
+    desc: drizzle studio
+    lint:
+    cmds:
+      - node --run studio

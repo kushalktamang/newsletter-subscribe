@@ -1,0 +1,50 @@
+version: "3"
+
+tasks:
+   dev:
+      desc: start all apps in dev the mode
+      deps:
+         - task: dev:web
+         - task: dev:server
+
+   dev:web:
+      desc: start web localhost
+      cmds:
+         - cd web && node --run dev
+
+   dev:server:
+      desc: start server localhost:8080
+      cmds:
+         - cd server && node --run dev
+
+   fmt:
+      desc: format all packages
+      deps:
+         - task: fmt:web
+         - task: fmt:server
+
+   fmt:web:
+      desc: format web files
+      cmds:
+         - cd web && node --run fmt
+
+   fmt:server:
+      desc: format web files
+      cmds:
+         - cd server && node --run fmt
+
+   lint:
+      desc: lint all the packages
+      cmds:
+         - task: lint:web
+         - task: lint:server
+
+   lint:web:
+      desc: linting on the frontend
+      cmds:
+         - cd web && node --run lint
+   
+   lint:server:
+      desc: linting on the frontend
+      cmds:
+         - cd server && node --run lint
