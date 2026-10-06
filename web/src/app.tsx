@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 const App = () => {
   return (
-    <section>
+    <section className="font-libron noise-background">
       <Outlet />
     </section>
   );

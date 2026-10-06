@@ -1,8 +1,4 @@
-import {
-  isRouteErrorResponse,
-  useRouteError,
-  useNavigate,
-} from "react-router-dom";
+import { isRouteErrorResponse, useRouteError, useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 
 const ErrorPage = () => {
@@ -20,18 +16,12 @@ const ErrorPage = () => {
 
       {isRouteErrorResponse(error) ? (
         <div>
-          <h1 className="text-6xl font-extrabold text-cream mb-2">
-            {error.status}
-          </h1>
-          <h2 className="text-2xl font-semibold text-cream mb-4">
-            {error.statusText}
-          </h2>
+          <h1 className="text-6xl font-extrabold text-cream mb-2">{error.status}</h1>
+          <h2 className="text-2xl font-semibold text-cream mb-4">{error.statusText}</h2>
         </div>
       ) : error instanceof Error ? (
         <div>
-          <h1 className="text-4xl font-bold text-cream mb-4">
-            Oops! Something went wrong.
-          </h1>
+          <h1 className="text-4xl font-bold text-cream mb-4">Oops! Something went wrong.</h1>
         </div>
       ) : (
         <h1 className="text-4xl font-bold text-cream mb-4">Unknown Error</h1>

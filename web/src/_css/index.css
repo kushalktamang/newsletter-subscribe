@@ -1,28 +1,45 @@
 @import "tailwindcss";
 
-@theme {
+/* ------------------------------------------------------------------ */
+/*  Libron Custom Typography                                         */
+/* ------------------------------------------------------------------ */
+/*  Libron Regular */
+@font-face {
+  font-family: "Libron";
+  src: url("/fonts/Libron-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --custom-font: "Libron", "Inter", system-ui, sans-serif;
+}
+
+@theme inline {
   --custom-white: #f9f6f0;
   --custom-black: #1c191f;
   --color-cream: var(--custom-white);
   --color-ink: var(--custom-black);
+  --font-libron: var(--custom-font);
 }
 
 @layer base {
   body {
-    background-color: #0d0d0d;
+    background-color: #10120f;
     font-family: monospace;
     color: var(--color-cream);
   }
 
   mark {
-     @apply text-indigo-600 bg-cream rounded px-1;
+    @apply text-indigo-600 bg-cream rounded px-3 py-1;
   }
 }
 
 @layer components {
-   #subscribe {
-      @apply flex flex-col items-center justify-center min-h-screen bg-[#0D0D0D];
-   }
+  #subscribe {
+    @apply flex flex-col items-center justify-center min-h-screen;
+  }
 }
 
 input:-webkit-autofill,
