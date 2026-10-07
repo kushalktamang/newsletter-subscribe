@@ -1,8 +1,8 @@
 import { Mail } from "lucide-react";
 import { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
-import APP_URL from "../_utils";
 import { z } from "zod";
+import APP_URL from "../utils/constants";
 
 interface SubscribeState {
   email: string;
@@ -11,6 +11,7 @@ interface SubscribeState {
 
 const errorPayloadSchema = z.object({ message: z.string().optional() });
 
+// form
 const InputForm = () => {
   const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const InputForm = () => {
     formData: FormData,
   ): Promise<SubscribeState> => {
     const email = formData.get("email");
+    // email check
     if (typeof email !== "string" || email === null) {
       return { email: "", error: null };
     }
