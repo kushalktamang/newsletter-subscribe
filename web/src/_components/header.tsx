@@ -1,6 +1,6 @@
 function Header() {
   return (
-    <div className="text-center text-4xl m-5 mv-10">
+    <div className="text-center text-xl sm:text-2xl md:text-3xl  m-5 mv-10">
       <h1 className="mb-2">
         Welcome to the free <mark>newsletter subscription</mark>
       </h1>
