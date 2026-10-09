@@ -28,7 +28,7 @@ const createServer = (): Express => {
   // @GET /api/v1/healthz
   server.use("/v1", checkHealth());
   // @GET /api/v1/newsletter/subscribe
-  server.use("/v1/newsletter", createSubscribeRouter());
+  server.use("/v1", createSubscribeRouter());
 
   // error handling for 404  route not found
   server.use(notFound);

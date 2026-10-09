@@ -1,0 +1,1 @@
+ALTER TABLE "subscribers" RENAME COLUMN "unsubscribe_token_hash" TO "unsubscribe_token";

@@ -5,7 +5,7 @@ import type { Router } from "express";
 const createSubscribeRouter = (): Router => {
   const subscribeRouter = express.Router();
 
-  subscribeRouter.post("/subscribe", subscribe);
+  subscribeRouter.post("/newsletter/subscribe", subscribe);
 
   return subscribeRouter;
 };

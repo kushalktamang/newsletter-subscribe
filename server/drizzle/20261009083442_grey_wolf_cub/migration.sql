@@ -1,0 +1,1 @@
+ALTER TABLE "subscribers" RENAME COLUMN "confirm_token_hash" TO "confirm_token";
