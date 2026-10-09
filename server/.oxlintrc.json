@@ -32,6 +32,8 @@
     "unicorn/no-null": "off",
     "no-duplicate-imports": "off",
     "new-cap": "off",
+    "max-statements": "off",
+    "max-nested-calls": "off",
 
     "import/no-unassigned-import": [
       "warn",

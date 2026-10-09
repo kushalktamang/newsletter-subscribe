@@ -11,21 +11,14 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [
-      react(),
-      tailwindcss(),
-      babel({ presets: [reactCompilerPreset()] }),
-    ],
+    plugins: [react(), tailwindcss(), babel({ presets: [reactCompilerPreset()] })],
 
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
     },
 
     server: {
-      port:
-        env.APP_PORT !== undefined && env.APP_PORT !== ""
-          ? Number(env.APP_PORT)
-          : 5173,
+      port: env.APP_PORT !== undefined && env.APP_PORT !== "" ? Number(env.APP_PORT) : 5173,
       proxy: {
         "/api": {
           target: `${env.VITE_APP_API_URL}/v1`,

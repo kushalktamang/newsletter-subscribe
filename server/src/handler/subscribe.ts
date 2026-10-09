@@ -5,10 +5,10 @@ import httpStatus from "http-status";
 import { z } from "zod";
 
 const subscribeSchema = z.object({
-  email: z.string().trim().toLowerCase().max(254),
+  email: z.email().trim().toLowerCase().max(254),
 });
 
-export type SubscribePayload = z.infer<typeof subscribeSchema>;
+// type SubscribePayload = z.infer<typeof subscribeSchema>;
 
 const subscribe = async (req: Request, res: Response) => {
   // 1. validate and normalize the email

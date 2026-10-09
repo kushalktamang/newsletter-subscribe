@@ -1,4 +1,4 @@
-const Header = () => {
+function Header() {
   return (
     <div className="text-center text-4xl m-5 mv-10">
       <h1 className="mb-2">
@@ -8,6 +8,6 @@ const Header = () => {
       <mark>notified</mark>
     </div>
   );
-};
+}
 
 export default Header;

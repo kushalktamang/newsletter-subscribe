@@ -48,3 +48,6 @@ dist
 
 # IntelliJ based IDEs
 .idea
+
+# Vitest reports and artifacts
+.vitest/

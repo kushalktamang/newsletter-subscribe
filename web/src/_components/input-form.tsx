@@ -2,7 +2,7 @@ import { Mail } from "lucide-react";
 import { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import APP_URL from "../utils/constants";
+import APP_URL from "../utils/api.js";
 
 interface SubscribeState {
   email: string;
@@ -12,7 +12,7 @@ interface SubscribeState {
 const errorPayloadSchema = z.object({ message: z.string().optional() });
 
 // form
-const InputForm = () => {
+function InputForm() {
   const navigate = useNavigate();
 
   const subscribeAction = async (
@@ -99,6 +99,6 @@ const InputForm = () => {
       </div>
     </section>
   );
-};
+}
 
 export default InputForm;

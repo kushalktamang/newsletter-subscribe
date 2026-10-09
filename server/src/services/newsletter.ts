@@ -1,6 +1,6 @@
 import db from "@/database/database.js";
 import subscriberTable from "@/database/schema.js";
-import { newToken } from "@/utils/random.js";
+import newToken from "@/utils/random.js";
 import { and, eq, gt, sql } from "drizzle-orm";
 
 const CONFIRM_TTL_MS = 24 * 60 * 60 * 1000;
@@ -36,7 +36,7 @@ const upsertSubscriber = async (rawEmail: string) => {
     return null;
   }
 
-  return { email, token: confirmToken }; // raw token goes in the confirm lin
+  return { email, token: confirmToken }; 
 };
 
 const confirmSubscriber = async (token: string) => {
