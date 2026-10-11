@@ -24,7 +24,18 @@ const envSchema = z.object({
   RESEND_SENDER: z.string().min(1),
 });
 
-const parsedEnv = envSchema.parse(process.env);
+const testEnvDefaults =
+  process.env.NODE_ENV === "test"
+    ? {
+        GCP_PROJECT_ID: "test-project",
+        PUBSUB_VERIFICATION_TOKEN: "test-verification-token",
+        APP_URL: "http://localhost:5174",
+        RESEND_API_KEY: "re_test",
+        RESEND_SENDER: "Newsletter <test@example.com>",
+      }
+    : {};
+
+const parsedEnv = envSchema.parse({ ...testEnvDefaults, ...process.env });
 const env = {
   ...parsedEnv,
   PUBSUB_MODE: parsedEnv.PUBSUB_MODE ?? (parsedEnv.NODE_ENV === "development" ? "local" : "gcp"),

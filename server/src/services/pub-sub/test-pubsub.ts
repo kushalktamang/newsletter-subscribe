@@ -7,7 +7,7 @@ export class TestPubSub implements PubSubService {
   }
 
   publish(topicId: string, _payload: Record<string, unknown>): Promise<string> {
-    logger.info(`Local Pub/Sub stub accepted a message for ${topicId}`);
+    logger.info(`Test Pub/Sub accepted a message for ${topicId}`);
     return Promise.resolve(`published to ${topicId} successfully`);
   }
 }

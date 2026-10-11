@@ -13,10 +13,11 @@ import errorHandler from "./handler/error/error-handler.js";
 import type PubSubService from "./services/pub-sub/types.js";
 import { MailerService } from "./services/mailer/types.js";
 import { createSendConfirmRoutes } from "./routes/newsletter/send-confirm-email-routes.js";
+import { createWelcomeEmailRoutes } from "./routes/newsletter/send-welcome-email-routes.js";
+import { createConfirmEmailRoutes } from "./routes/newsletter/confirm-email-routes.js";
 
 interface CreateServerParams {
   pubSub: PubSubService;
-
   mailer: MailerService;
 }
 
@@ -39,7 +40,9 @@ const createServer = ({ pubSub, mailer }: CreateServerParams): Express => {
   server.use("/v1", checkHealth());
   // @GET /api/v1/newsletter/subscribe
   server.use("/v1", createSubscribeRouter(pubSub));
+  server.use("/v1", createConfirmEmailRoutes(pubSub));
   server.use("/v1", createSendConfirmRoutes(mailer));
+  server.use("/v1", createWelcomeEmailRoutes(mailer));
 
   // error handling for 404  route not found
   server.use(notFound);

@@ -1,9 +1,5 @@
 import env from "@/config/env.js";
-import {
-  MailerService,
-  SendConfirmEmailPayload,
-  SendWelcomeEmailPayload,
-} from "./types.js";
+import type { MailerService, SendConfirmEmailPayload, SendWelcomeEmailPayload } from "./types.js";
 import { Resend } from "resend";
 import logger from "@/config/logger.js";
 
@@ -12,10 +8,10 @@ interface ResendServiceConfig {
   apiKey: string;
 }
 
-const app_url = env.APP_URL;
+const appUrl = env.APP_URL;
 
 export class ResendService implements MailerService {
-  private resend: Resend;
+  private readonly resend: Resend;
   private readonly sender: string;
 
   constructor({ sender, apiKey }: ResendServiceConfig) {
@@ -24,19 +20,15 @@ export class ResendService implements MailerService {
   }
 
   async sendConfirmationEmail({ email, token }: SendConfirmEmailPayload) {
-    console.log("resendService: sending confirmation email");
-
-    if (!email || !token) {
+    if (email.length === 0 || token.length === 0) {
       throw new Error("email and token are required");
     }
 
-    const link = `${app_url}/confirm-email?token=${encodeURIComponent(
+    const link = `${appUrl}/confirm-email?token=${encodeURIComponent(
       token,
     )}&email=${encodeURIComponent(email)}`;
 
-    logger.info("ResendService::sendWelcomeEmail: sending email template")
-
-    await this.resend.emails.send({
+    const { error } = await this.resend.emails.send({
       from: this.sender,
       to: email,
       subject: "confirmation email",
@@ -45,20 +37,30 @@ export class ResendService implements MailerService {
              <a href="${link}">${link}</a>
            `,
     });
+
+    if (error !== null) {
+      logger.error("Resend failed to send confirmation email", error);
+      throw new Error(`Resend failed to send confirmation email: ${error.message}`);
+    }
+
+    logger.info("Resend accepted confirmation email", { email });
   }
 
   async sendWelcomeEmail({ email }: SendWelcomeEmailPayload): Promise<void> {
-    console.log("resendService: sending welcome email");
-
-    if (!email) {
+    if (email.length === 0) {
       throw new Error("email is required");
     }
 
-    await this.resend.emails.send({
+    const { error } = await this.resend.emails.send({
       from: this.sender,
       to: email,
       subject: "welcome email",
       html: `<p>welcome to our newsletter</p>`,
     });
+
+    if (error !== null) {
+      logger.error("Resend failed to send welcome email", error);
+      throw new Error(`Resend failed to send welcome email: ${error.message}`);
+    }
   }
 }

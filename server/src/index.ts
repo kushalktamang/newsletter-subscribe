@@ -3,19 +3,18 @@ import logger from "./config/logger.js";
 import createServer from "./server.js";
 import { ResendService } from "./services/mailer/mailer.js";
 import { GooglePubSubService } from "./services/pub-sub/gcp.js";
-import { TestPubSub } from "./services/pub-sub/test-pubsub.js";
-import PubSubService from "./services/pub-sub/types.js";
+import { LocalPubSubService } from "./services/pub-sub/local-pubsub.js";
+import type PubSubService from "./services/pub-sub/types.js";
 
 const PORT = Math.trunc(Number(env.PORT));
-const pubSub: PubSubService =
-  env.NODE_ENV === "development"
-    ? new TestPubSub()
-    : new GooglePubSubService(env.GCP_PROJECT_ID);
-
 const mailer = new ResendService({
   apiKey: env.RESEND_API_KEY,
   sender: env.RESEND_SENDER,
 });
+const pubSub: PubSubService =
+  env.PUBSUB_MODE === "local"
+    ? new LocalPubSubService(mailer)
+    : new GooglePubSubService(env.GCP_PROJECT_ID);
 
 const server = createServer({ pubSub, mailer }).listen(PORT, (error) => {
   if (error !== undefined) {

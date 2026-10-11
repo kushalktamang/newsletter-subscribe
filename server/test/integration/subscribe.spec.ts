@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import createServer from "../../src/server";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
-import { upsertSubscriber } from "../../src/services/newsletter.js";
+import { confirmSubscriber, upsertSubscriber } from "../../src/services/newsletter.js";
 import { TestPubSub } from "../../src/services/pub-sub/test-pubsub";
 import TestMailer from "../../src/services/mailer/test-mailer";
 
@@ -11,9 +11,7 @@ import { z } from "zod";
 const errorBodySchema = z.object({ message: z.string() });
 
 vi.mock("../../src/services/newsletter.js", () => ({
-  upsertSubscriber: vi
-    .fn()
-    .mockResolvedValue({ email: "valid@mail.com", token: "test-token" }),
+  upsertSubscriber: vi.fn().mockResolvedValue({ email: "valid@mail.com", token: "test-token" }),
   confirmSubscriber: vi.fn(),
 }));
 
@@ -38,15 +36,16 @@ describe("subscribe", () => {
     expect(upsertSubscriber).not.toHaveBeenCalled();
   });
 
-  it("should return 200 if valid email is sent", async () => {
+  it("should accept a valid email without exposing its confirmation token", async () => {
     const publish = vi.spyOn(pubSub, "publish").mockResolvedValue("published");
 
-    await request(server)
+    const response = await request(server)
       .post("/v1/newsletter/subscribe")
       .send({ email: "valid@mail.com" })
       .expect("Content-Type", /json/u)
-      .expect(httpStatus.OK);
+      .expect(httpStatus.ACCEPTED);
 
+    expect(response.body).not.toHaveProperty("token");
     expect(upsertSubscriber).toHaveBeenCalledWith("valid@mail.com");
     expect(publish).toHaveBeenCalledWith("newsletter-subscribe", {
       email: "valid@mail.com",
@@ -61,19 +60,28 @@ describe("subscribe", () => {
     await request(server)
       .post("/v1/newsletter/subscribe")
       .send({ email: "valid@mail.com" })
-      .expect(httpStatus.OK);
+      .expect(httpStatus.ACCEPTED);
 
     expect(publish).not.toHaveBeenCalled();
   });
 
   it("should return 500 if publishing the confirmation job fails", async () => {
-    vi.spyOn(pubSub, "publish").mockRejectedValueOnce(
-      new Error("Pub/Sub unavailable"),
-    );
+    vi.spyOn(pubSub, "publish").mockRejectedValueOnce(new Error("Pub/Sub unavailable"));
 
     await request(server)
       .post("/v1/newsletter/subscribe")
       .send({ email: "valid@mail.com" })
       .expect(httpStatus.INTERNAL_SERVER_ERROR);
+  });
+
+  it("should confirm an email at the route used by the frontend", async () => {
+    vi.mocked(confirmSubscriber).mockResolvedValueOnce(true);
+
+    await request(server)
+      .post("/v1/newsletter/confirm-email")
+      .send({ email: "valid@mail.com", token: "test-token" })
+      .expect(httpStatus.OK);
+
+    expect(confirmSubscriber).toHaveBeenCalledWith("valid@mail.com", "test-token");
   });
 });

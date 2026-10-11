@@ -65,9 +65,7 @@ function ConfirmEmail() {
     <section className="flex flex-col items-center justify-center min-h-screen">
       <div className="text-center text-cream">
         <h1 className="text-4xl font-bold mb-4">
-          {status === "loading"
-            ? "Confirming your email..."
-            : "Confirmation failed"}
+          {status === "loading" ? "Confirming your email..." : "Confirmation failed"}
         </h1>
         <p className="text-gray-400 text-sm">{message}</p>
       </div>

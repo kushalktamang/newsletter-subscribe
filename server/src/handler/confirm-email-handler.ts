@@ -1,28 +1,28 @@
 import HttpStatus from "http-status";
 import type { Request, Response } from "express";
-import { MailerService } from "@/services/mailer/types.js";
-import PubSubService from "@/services/pub-sub/types.js";
+import type PubSubService from "@/services/pub-sub/types.js";
 import { confirmSubscriber } from "@/services/newsletter.js";
 import logger from "@/config/logger.js";
+import { z } from "zod";
 
-interface ConfirmEmailPayload {
-  email?: string;
-  token?: string;
-}
+const confirmEmailSchema = z.object({
+  email: z.email().trim().toLowerCase(),
+  token: z.string().min(1),
+});
 
 export const confirmEmailHandler =
-  (pubSub: PubSubService, mailer: MailerService) =>
-  async (req: Request, res: Response) => {
+  (pubSub: PubSubService) => async (req: Request, res: Response) => {
     try {
-      const { email, token } = req.body as ConfirmEmailPayload;
+      const parsed = confirmEmailSchema.safeParse(req.body);
 
-      if (!email || !token) {
+      if (!parsed.success) {
         return res.status(HttpStatus.BAD_REQUEST).json({
           success: false,
-          message: "email and token are required",
+          message: "valid email and token are required",
         });
       }
 
+      const { email, token } = parsed.data;
       const confirmed = await confirmSubscriber(email, token);
       if (!confirmed) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -32,11 +32,6 @@ export const confirmEmailHandler =
       }
 
       await pubSub.publish("newsletter-email-confirmed", { email });
-      try {
-        await mailer.sendWelcomeEmail({ email });
-      } catch (error) {
-        logger.error("welcome email failed", error);
-      }
 
       return res.status(HttpStatus.OK).json({
         success: true,

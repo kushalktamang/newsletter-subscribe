@@ -5,10 +5,7 @@ import { Router } from "express";
 export const createSendConfirmRoutes = (mailer: MailerService) => {
   const sendConfirmRoutes: Router = Router();
 
-  sendConfirmRoutes.post(
-    "/newsletter/send-confirm-email",
-    sendConfirmEmailHandler(mailer),
-  );
+  sendConfirmRoutes.post("/newsletter/send-confirm-email", sendConfirmEmailHandler(mailer));
 
   return sendConfirmRoutes;
 };
