@@ -4,22 +4,24 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
 import { upsertSubscriber } from "../../src/services/newsletter.js";
 import { TestPubSub } from "../../src/services/pub-sub/test-pubsub";
-// import TestMailer from "../../src/services/mailer/test-mailer";
+import TestMailer from "../../src/services/mailer/test-mailer";
 
 import { z } from "zod";
 
 const errorBodySchema = z.object({ message: z.string() });
 
 vi.mock("../../src/services/newsletter.js", () => ({
-  upsertSubscriber: vi.fn().mockResolvedValue({ email: "valid@mail.com", token: "test-token" }),
+  upsertSubscriber: vi
+    .fn()
+    .mockResolvedValue({ email: "valid@mail.com", token: "test-token" }),
   confirmSubscriber: vi.fn(),
 }));
 
 describe("subscribe", () => {
   const pubSub = new TestPubSub();
-  // const mailer = new TestMailer();
+  const mailer = new TestMailer();
 
-  const server = createServer({ pubSub });
+  const server = createServer({ pubSub, mailer });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -65,12 +67,13 @@ describe("subscribe", () => {
   });
 
   it("should return 500 if publishing the confirmation job fails", async () => {
-    vi.spyOn(pubSub, "publish").mockRejectedValueOnce(new Error("Pub/Sub unavailable"));
+    vi.spyOn(pubSub, "publish").mockRejectedValueOnce(
+      new Error("Pub/Sub unavailable"),
+    );
 
     await request(server)
       .post("/v1/newsletter/subscribe")
       .send({ email: "valid@mail.com" })
       .expect(httpStatus.INTERNAL_SERVER_ERROR);
   });
-
 });

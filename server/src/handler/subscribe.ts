@@ -37,11 +37,7 @@ const subscribeHandler =
 
       logger.info("Subscribe handler: request processed");
 
-      res.status(httpStatus.OK).json({
-        success: true,
-        message:
-          "If this email can be subscribed, a confirmation link is on its way.",
-      });
+      res.status(httpStatus.CREATED).json(subscriber);
     } catch (error) {
       logger.error(error);
       res.status(httpStatus.INTERNAL_SERVER_ERROR).json({

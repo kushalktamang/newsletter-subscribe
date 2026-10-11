@@ -48,4 +48,5 @@ class GooglePubSubService implements PubSubService {
   }
 }
 
-export { GCPPubSubPayload, isPubSubPayload, GooglePubSubService };
+export type { GCPPubSubPayload };
+export { isPubSubPayload, GooglePubSubService };
