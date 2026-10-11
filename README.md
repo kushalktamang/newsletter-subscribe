@@ -1,77 +1,75 @@
 # Newsletter Subscribe
 
-A newsletter signup application with a React frontend and an Express API. The
-API stores pending subscriptions in PostgreSQL, sends confirmation email through
-Resend, and activates subscribers when they confirm the link.
+A newsletter signup site built with React and Express. Visitors submit an email
+address, receive a confirmation link, and become active subscribers after
+confirming it. Subscriber records are stored in PostgreSQL.
 
 ![Newsletter subscribe preview](newsletter-subscribe-preview.png)
 
-## Stack
+## Technology
 
-- **Frontend:** React, TypeScript, Vite
-- **API:** Node.js, Express, TypeScript
-- **Database:** PostgreSQL with Drizzle ORM
-- **Email:** Resend
-- **Jobs:** Google Cloud Pub/Sub in GCP mode
+- React 19, TypeScript, Vite, and Tailwind CSS
+- Node.js 24, Express 5, and TypeScript
+- PostgreSQL with Drizzle ORM
+- Resend for confirmation and welcome emails
+- Google Cloud Pub/Sub for asynchronous email delivery when running in GCP mode
 
 ## Requirements
 
-- Node.js 24 (see `server/.nvmrc` and `web/.nvmrc`)
-- pnpm
-- Task (go-task), for the combined development command
-- A PostgreSQL database
-- A Resend account and a verified sender domain for delivery to arbitrary
-  recipients
+- Node.js 24 and pnpm
+- PostgreSQL database
+- Resend account
+- [go-task](https://taskfile.dev/) to run both apps together
 
-## Local development
+For Resend testing mode, the recipient must be the email address associated
+with your Resend account. To send to other recipients, verify a domain you own
+in Resend and use a sender address on that domain.
 
-Install dependencies in each application:
+## Local setup
+
+Install dependencies in each app:
 
 ```bash
 cd server && pnpm install
 cd ../web && pnpm install
 ```
 
-Create `server/.env` from `server/.env.example`. Set `DATABASE_URL` to your
-PostgreSQL connection string, and set `RESEND_API_KEY` and `RESEND_SENDER` to
-your Resend credentials. For local email delivery, Resend's testing sender can
-only send to the email address associated with your Resend account. To test
-with other recipients, verify a domain in Resend and use a sender on that
-domain.
+Create `server/.env` using `server/.env.example`. Set `DATABASE_URL` to your
+PostgreSQL connection string, and configure `RESEND_API_KEY` and
+`RESEND_SENDER`. The development defaults use local delivery through Resend
+(`PUBSUB_MODE=local`), so Google Cloud credentials are not needed.
 
-The web app also needs a `web/.env` file:
+Create `web/.env`:
 
 ```env
 APP_ENV="development"
 APP_PORT="5174"
-VITE_APP_API_URL="http://localhost:8080"
+VITE_APP_API_URL="http://localhost:8080/v1"
 ```
 
-Run both apps from the repository root:
+Start the frontend and backend from the repository root:
 
 ```bash
 task dev
 ```
 
-The frontend is available at `http://localhost:5174`; the API is available at
-`http://localhost:8080`. Wait for both servers to report ready before
-submitting the form. The Vite development proxy forwards `/api/*` requests to
-the API.
-
-In development, `PUBSUB_MODE` defaults to `local`: the API sends confirmation
-emails directly through Resend, without Google Cloud credentials. The local
-adapter also sends the welcome email after a successful confirmation.
+The site runs at `http://localhost:5174`, and the API runs at
+`http://localhost:8080`. The frontend calls `VITE_APP_API_URL` directly, so
+include `/v1` in its value to match the API routes. The Vite config also has an
+`/api` proxy, but the current frontend does not use it when
+`VITE_APP_API_URL` is set. Wait for both apps to report ready before testing
+the signup flow.
 
 ## Database
 
-Set `DATABASE_URL` in `server/.env`, then apply the checked-in migrations:
+Set `DATABASE_URL` in `server/.env`, then apply the existing migrations:
 
 ```bash
 cd server
 pnpm run migrate
 ```
 
-To create a migration after changing the Drizzle schema:
+After changing the Drizzle schema, generate and apply a migration:
 
 ```bash
 cd server
@@ -79,18 +77,38 @@ pnpm run generate
 pnpm run migrate
 ```
 
-## Tests and checks
+## Signup and email flow
 
-Run the server tests and build:
+1. `POST /v1/newsletter/subscribe` validates and stores a pending subscriber.
+2. The API sends a confirmation email through Resend. In local mode this is
+   direct; in GCP mode the API publishes a Pub/Sub message.
+3. The email link opens the frontend at `/confirm-email`, which posts the email
+   and token to `POST /v1/newsletter/confirm-email`.
+4. The API confirms the subscriber and sends a welcome email. In local mode it
+   is sent directly; in GCP mode a second Pub/Sub topic handles it.
+
+API routes:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/healthz` | Health check |
+| `POST` | `/v1/newsletter/subscribe` | Start or reissue a subscription |
+| `POST` | `/v1/newsletter/confirm-email` | Confirm a pending subscription |
+| `POST` | `/v1/newsletter/send-confirm-email` | Pub/Sub push endpoint for confirmation emails |
+| `POST` | `/v1/newsletter/send-welcome-email` | Pub/Sub push endpoint for welcome emails |
+
+## Tests and builds
+
+Server:
 
 ```bash
 cd server
-pnpm test -- --run
+pnpm exec vitest run
 pnpm build
 pnpm lint
 ```
 
-Run frontend checks:
+Frontend:
 
 ```bash
 cd web
@@ -98,73 +116,81 @@ pnpm run build
 pnpm lint
 ```
 
-## API routes
+## Deployment
 
-The API routes are mounted under `/v1`:
+The intended layout is a Vercel-hosted static frontend and a Render-hosted
+Express API. Use separate environment settings for each deployment. Do not
+commit `.env` files, API keys, database credentials, or service-account keys.
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/v1/healthz` | Health check |
-| `POST` | `/v1/newsletter/subscribe` | Create or reissue a subscription confirmation |
-| `POST` | `/v1/newsletter/confirm-email` | Confirm a subscriber |
-| `POST` | `/v1/newsletter/send-confirm-email` | Pub/Sub push endpoint for confirmation email |
-| `POST` | `/v1/newsletter/send-welcome-email` | Pub/Sub push endpoint for welcome email |
+### Frontend on Vercel
 
-## Deploying
+Set the Vercel project root to `web`, build command to `pnpm run build`, and
+output directory to `dist`. Configure this build environment variable:
 
-The intended hosting layout is the static frontend on Vercel and the Node API
-on Render. Configure the API, frontend, database, Resend, and optional Google
-Cloud Pub/Sub using each provider's environment-variable settings. Never commit
-`.env` files, API keys, or service-account credentials.
+```env
+VITE_APP_API_URL=https://YOUR-RENDER-SERVICE.onrender.com/v1
+```
 
-### Vercel frontend
+The frontend uses this value as the API base URL. If it is missing, it falls
+back to `/api`, which needs a working proxy or rewrite to the backend. The
+current `web/vercel.json` has a misspelled `rewites` key, so Vercel will not
+apply its intended SPA fallback. Correct it to `rewrites` before relying on
+that config for deep links such as `/confirm-email`. A basic SPA fallback is:
 
-Use `web` as the Vercel project root. Set the build command to
-`pnpm run build` and the output directory to `dist`. The current frontend calls
-the API through relative `/api/...` URLs, so configure a Vercel rewrite from
-`/api/:path*` to `https://YOUR-RENDER-SERVICE.onrender.com/v1/:path*`. This
-keeps browser requests same-origin and avoids requiring permissive API CORS
-configuration. Replace the example hostname with the actual Render service
-URL.
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
 
-### Render API
+### API on Render
 
-Use `server` as the Render service root. Set:
+Set the Render service root to `server`, build command to
+`pnpm install --frozen-lockfile && pnpm run build`, and start command to
+`pnpm start`. Configure:
 
-- **Build command:** `pnpm install --frozen-lockfile && pnpm run build`
-- **Start command:** `pnpm start`
-
-Set `NODE_ENV=production` and configure these variables in Render:
-
-| Variable | Value |
+| Variable | Production value |
 | --- | --- |
-| `PORT` | Supplied by Render |
+| `NODE_ENV` | `production` |
+| `PORT` | Use the port supplied by Render |
 | `DATABASE_URL` | Production PostgreSQL connection string |
 | `GCP_PROJECT_ID` | Google Cloud project ID |
 | `PUBSUB_MODE` | `gcp` |
-| `PUBSUB_VERIFICATION_TOKEN` | Long random secret |
-| `APP_URL` | Public Vercel site URL, used in confirmation links |
+| `PUBSUB_VERIFICATION_TOKEN` | Long random secret (currently required by config; push handlers do not yet validate it) |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to the Google service-account JSON secret file on Render |
+| `APP_URL` | Public Vercel site URL used in email links |
 | `RESEND_API_KEY` | Resend API key |
-| `RESEND_SENDER` | Sender address on a domain verified in Resend |
+| `RESEND_SENDER` | Address on a domain verified in Resend |
 
-Run database migrations against the production database before accepting
-subscriptions.
+Run database migrations against the production database before opening
+signups. The Express API currently enables permissive CORS; if calling the API
+directly from a browser, restrict allowed origins to the deployed frontend.
 
 ### Google Cloud Pub/Sub
 
-When `PUBSUB_MODE=gcp`, the API publishes to topic names that include the
-`NODE_ENV` suffix. For production, create these topics:
+In GCP mode, topic names include the `NODE_ENV` suffix. With production
+configuration, create:
 
 - `newsletter-subscribe-production`
 - `newsletter-email-confirmed-production`
 
-Configure push subscriptions to call the Render HTTPS endpoints
-`/v1/newsletter/send-confirm-email` and
-`/v1/newsletter/send-welcome-email`, respectively. The Render service also needs
-Google Application Default Credentials with permission to publish to those
-topics.
+Configure push subscriptions to call the corresponding Render HTTPS endpoints:
 
-**Before enabling public Pub/Sub push subscriptions, secure the push
-endpoints.** The current handlers do not authenticate incoming Pub/Sub
-requests. Also add rate limiting and an unsubscribe endpoint before treating
-the application as production-ready for public signups.
+- `https://YOUR-RENDER-SERVICE.onrender.com/v1/newsletter/send-confirm-email`
+- `https://YOUR-RENDER-SERVICE.onrender.com/v1/newsletter/send-welcome-email`
+
+Provide the Render API with Google Application Default Credentials for a
+service account that can publish to the topics. Store credentials using
+Render's secret-file mechanism (not in the repository or ordinary source
+files). The push endpoints currently validate payload shape but do **not**
+authenticate the Pub/Sub caller; secure them before enabling public production
+delivery.
+
+## Before accepting public signups
+
+- Add authentication for Pub/Sub push requests.
+- Add an unsubscribe endpoint (the database has unsubscribe fields, but no
+  current API route implements unsubscribing).
+- Add rate limiting and abuse protection to public endpoints.
+- Fix the `rewites` spelling in `web/vercel.json` before relying on Vercel SPA
+  fallback routing.

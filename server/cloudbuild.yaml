@@ -1,36 +1,32 @@
 steps:
-   - name: "grc.io/cloud-builders/docker"
-     args:
-        [
-           "build",
-           "-t",
-           "europe-west1-docker.pkg.dev/%PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe",
-           "${_PATH}",
-        ]
-   - name: "gcr.io/cloud-builders/docker"
-     args:
-        [
-           "push",
-           "europe-west1-docker.pkg.dev/%PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe",
-        ]
-   - name: "gcr.io/cloud-builders/gcloud"
-     args:
-        [
-           "run",
-           "deploy",
-           "newsletter-subscribe",
-           "--image",
-           "europe-west1-docker.pkg.dev/%PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe",
-           "--region",
-           "eurpe-west1",
-           "--platform",
-           "managed",
-           "--alowed-unauthentication",
-        ]
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "europe-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe",
+        "${_PATH}",
+      ]
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "europe-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe"]
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "run",
+        "deploy",
+        "newsletter-subscribe",
+        "--image",
+        "europe-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe",
+        "--region",
+        "europe-west1",
+        "--platform",
+        "managed",
+        "--alowed-unauthenticated",
+      ]
 
 substitutions:
-   _SERVICE_NAME: newsletter-subscribe
-   _PATH: .
+  _SERVICE_NAME: newsletter-subscribe
+  _PATH: .
 
 images:
-   - "europe-west1-docker.pkg.dev/%PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe"
+  - "europe-west1-docker.pkg.dev/%PROJECT_ID/${_SERVICE_NAME}/newsletter-subscribe"
