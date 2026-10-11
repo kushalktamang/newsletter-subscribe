@@ -36,10 +36,10 @@ const upsertSubscriber = async (rawEmail: string) => {
     return null;
   }
 
-  return { email, token: confirmToken }; 
+  return { email, token: confirmToken };
 };
 
-const confirmSubscriber = async (token: string) => {
+const confirmSubscriber = async (email: string, token: string) => {
   const [confirmed] = await db
     .update(subscriberTable)
     .set({
@@ -49,6 +49,7 @@ const confirmSubscriber = async (token: string) => {
     })
     .where(
       and(
+        eq(subscriberTable.email, email),
         eq(subscriberTable.confirmToken, token),
         gt(subscriberTable.confirmTokenExpiresAt, new Date()),
       ),

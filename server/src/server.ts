@@ -9,8 +9,14 @@ import httpStatus from "http-status";
 import morganMiddleware from "./middleware/morgan.js";
 import notFound from "./middleware/not-found.js";
 import createSubscribeRouter from "./routes/newsletter/subscribe-routes.js";
+import errorHandler from "./handler/error/error-handler.js";
+import type PubSubService from "./services/pub-sub/types.js";
 
-const createServer = (): Express => {
+interface CreateServerParams {
+  pubSub: PubSubService;
+}
+
+const createServer = ({ pubSub }: CreateServerParams): Express => {
   const server = express();
 
   server.use(helmet());
@@ -22,16 +28,17 @@ const createServer = (): Express => {
 
   server.get("/", (_, res) => {
     logger.info("express blueprint");
-    res.status(httpStatus.OK).send("blueprint for express with typescript");
+    res.status(httpStatus.OK).send("newsletter subscribe");
   });
 
   // @GET /api/v1/healthz
   server.use("/v1", checkHealth());
   // @GET /api/v1/newsletter/subscribe
-  server.use("/v1", createSubscribeRouter());
+  server.use("/v1", createSubscribeRouter(pubSub));
 
   // error handling for 404  route not found
   server.use(notFound);
+  server.use(errorHandler);
 
   return server;
 };

@@ -1,10 +1,12 @@
 import env from "./config/env.js";
 import logger from "./config/logger.js";
 import createServer from "./server.js";
+import { TestPubSub } from "./services/pub-sub/test-pubsub.js";
 
 const PORT = Math.trunc(Number(env.PORT));
+const pubSub = new TestPubSub();
 
-const server = createServer().listen(PORT, (error) => {
+const server = createServer({ pubSub }).listen(PORT, (error) => {
   if (error !== undefined) {
     logger.error("Failed to start the server", error);
     return;

@@ -16,8 +16,18 @@ const envSchema = z.object({
   PORT: z.string().default("8081"),
   LOG_LEVEL: z.enum(["error", "warn", "info", "http", "verbose", "debug", "silly"]).default("info"),
   DATABASE_URL: z.string(),
+  GCP_PROJECT_ID: z.string().min(1),
+  PUBSUB_MODE: z.enum(["local", "gcp"]).optional(),
+  PUBSUB_VERIFICATION_TOKEN: z.string().min(1),
+  APP_URL: z.string(),
+  RESEND_API_KEY: z.string().startsWith("re_"),
+  RESEND_SENDER: z.string().min(1),
 });
 
-const env = envSchema.parse(process.env);
+const parsedEnv = envSchema.parse(process.env);
+const env = {
+  ...parsedEnv,
+  PUBSUB_MODE: parsedEnv.PUBSUB_MODE ?? (parsedEnv.NODE_ENV === "development" ? "local" : "gcp"),
+};
 
 export default env;

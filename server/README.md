@@ -53,3 +53,20 @@ task studio
 ```
 
 The API will be available at `http://localhost:8080`
+
+### Google Cloud Pub/Sub
+
+Local development defaults to a Pub/Sub stub, so the server can run without
+Google credentials. The stub accepts jobs but does not deliver confirmation
+emails. To publish to Google Cloud locally, set `PUBSUB_MODE=gcp`, create the
+`newsletter-subscribe-development` topic in the project configured by
+`GCP_PROJECT_ID`, and authenticate with Application Default Credentials:
+
+```bash
+gcloud auth application-default login
+gcloud config set project YOUR_GCP_PROJECT_ID
+```
+
+The authenticated account needs the Pub/Sub Publisher role on the project or
+topic. In deployed environments, configure Application Default Credentials
+using the platform's service identity instead of a local user login.
