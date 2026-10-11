@@ -1,9 +1,5 @@
 import logger from "@/config/logger.js";
-import {
-  MailerService,
-  SendConfirmEmailPayload,
-  SendWelcomeEmailPayload,
-} from "./types.js";
+import { MailerService, SendConfirmEmailPayload, SendWelcomeEmailPayload } from "./types.js";
 
 export default class TestMailer implements MailerService {
   async sendWelcomeEmail(payload: SendWelcomeEmailPayload): Promise<void> {

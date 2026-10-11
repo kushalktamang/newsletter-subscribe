@@ -1,14 +1,15 @@
 import { useLocation } from "react-router-dom";
+import { z } from "zod";
 
-interface ConfirmState {
-  email?: string;
-  confirmed?: boolean;
-}
+const confirmStateSchema = z.object({
+  email: z.string().optional(),
+  confirmed: z.boolean().optional(),
+});
 
 function ConfirmEmailSent() {
   const location = useLocation();
-  const state = (location.state ?? {}) as ConfirmState;
-  const confirmed = Boolean(state.confirmed);
+  const parsedState = confirmStateSchema.safeParse(location.state);
+  const confirmed = parsedState.success && parsedState.data.confirmed === true;
 
   return (
     <section className="flex flex-col items-center justify-center min-h-screen">

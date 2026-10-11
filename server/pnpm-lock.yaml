@@ -9,89 +9,89 @@ importers:
   .:
     dependencies:
       '@google-cloud/pubsub':
-        specifier: ^6.2.0
+        specifier: 6.2.0
         version: 6.2.0
       '@neondatabase/serverless':
-        specifier: ^1.1.0
+        specifier: 1.1.0
         version: 1.1.0
       cookie-parser:
-        specifier: ^1.4.7
+        specifier: 1.4.7
         version: 1.4.7
       cors:
-        specifier: ^2.8.6
+        specifier: 2.8.6
         version: 2.8.6
       dotenv:
-        specifier: ^18.0.3
+        specifier: 18.0.3
         version: 18.0.3
       drizzle-orm:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(zod@4.6.5)
       express:
-        specifier: ^5.2.1
+        specifier: 5.2.1
         version: 5.2.1
       helmet:
-        specifier: ^8.3.0
+        specifier: 8.3.0
         version: 8.3.0
       http-status:
-        specifier: ^2.1.0
+        specifier: 2.1.0
         version: 2.1.0
       morgan:
-        specifier: ^1.12.1
+        specifier: 1.12.1
         version: 1.12.1
       resend:
-        specifier: ^6.32.1
+        specifier: 6.32.1
         version: 6.32.1
       winston:
-        specifier: ^3.19.0
+        specifier: 3.19.0
         version: 3.19.0
       zod:
-        specifier: ^4.6.5
+        specifier: 4.6.5
         version: 4.6.5
     devDependencies:
       '@types/cookie-parser':
-        specifier: ^1.4.10
+        specifier: 1.4.10
         version: 1.4.10(@types/express@5.0.6)
       '@types/cors':
-        specifier: ^2.8.19
+        specifier: 2.8.19
         version: 2.8.19
       '@types/express':
-        specifier: ^5.0.6
+        specifier: 5.0.6
         version: 5.0.6
       '@types/morgan':
-        specifier: ^1.9.10
+        specifier: 1.9.10
         version: 1.9.10
       '@types/node':
-        specifier: ^26.6.2
+        specifier: 26.6.2
         version: 26.6.2
       '@types/supertest':
-        specifier: ^7.2.1
+        specifier: 7.2.1
         version: 7.2.1
       drizzle-kit:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4
       oxfmt:
-        specifier: ^0.70.0
+        specifier: 0.70.0
         version: 0.70.0
       oxlint:
-        specifier: ^1.85.0
+        specifier: 1.85.0
         version: 1.85.0(oxlint-tsgolint@7.0.2002)
       oxlint-tsgolint:
-        specifier: ^7.0.2002
+        specifier: 7.0.2002
         version: 7.0.2002
       supertest:
-        specifier: ^7.3.1
+        specifier: 7.3.1
         version: 7.3.1
       tsx:
-        specifier: ^4.23.15
+        specifier: 4.23.15
         version: 4.23.15
       typescript:
-        specifier: ^7.0.2
+        specifier: 7.0.2
         version: 7.0.2
       vite-tsconfig-paths:
-        specifier: ^6.1.1
+        specifier: 6.1.1
         version: 6.1.1(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
       vitest:
-        specifier: ^5.0.3
+        specifier: 5.0.3
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(vite@8.3.4(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
 packages:
